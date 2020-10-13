@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/tls"
+	"flag"
 	"fmt"
 	"github.com/fatih/color"
 	"github.com/luckysuperduper/staticserver/middleware"
@@ -81,10 +82,22 @@ func main() {
 		Addr: portSSL,
 	}
 
-	// questions
-	ssl = doYouWant("ssl")
-	gzip = doYouWant("gzip")
-	cache = doYouWant("cache")
+	sslPtr := flag.Bool("ssl", false, "Activate HTTPS server")
+	gzipPtr := flag.Bool("gzip", false, "Activate gzip")
+	cachePtr := flag.Bool("cache", false, "Activate cache")
+	flag.Parse()
+	// Get the values for pointers
+
+	if *sslPtr || *gzipPtr || *cachePtr {
+		ssl = *sslPtr
+		gzip = *gzipPtr
+		cache = *cachePtr
+	} else {
+		// questions
+		ssl = doYouWant("ssl")
+		gzip = doYouWant("gzip")
+		cache = doYouWant("cache")
+	}
 
 	// ssl logic
 	if ssl {
