@@ -13,6 +13,14 @@ staticserver -ssl -gzip -cache
 
 You can also type only `staticserver` and answer the questions for configuring the local server.
 
+# Options
+
+- `ssl`: activate an HTTPS server for local development
+- `gzip`: activate gzip for local development
+- `cache`: activate cache for local development
+
+> The flags are useful for obtaining 100% score in Google Lighthouse.
+
 # Livereload
 
 For livereload use `air` and configure it to run `staticserver`
