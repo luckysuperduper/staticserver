@@ -13,29 +13,57 @@ import (
 )
 
 var (
-	ssl     bool
-	gzip    bool
-	cache   bool
-	blue    *color.Color
-	certPEM = `-----BEGIN CERTIFICATE-----
-MIIB2DCCATmgAwIBAgIBATAKBggqhkjOPQQDBDAWMRQwEgYDVQQKEwtEZXZlbG9w
-bWVudDAeFw0yMDEwMTMxMzI1MzBaFw00ODAyMjkxMzI1MzBaMBYxFDASBgNVBAoT
-C0RldmVsb3BtZW50MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQAUaO86ZrWUD2y
-nJu6UUOSg/e4V01Disg+NxAqeIQ7w7TFEBQhlRZK7KMt1wOqhKgyrNryUn6jFTXL
-WTGwX/9H+roACqoKqn0kcjNUHBs+MHO2zhAzqDsyhNN3XbgdC68OuFKO/2ISBMTd
-zxFhG9PC8S9lFCi3ToSwqbBQhe1E6kxXt0CjNTAzMA4GA1UdDwEB/wQEAwIFoDAT
-BgNVHSUEDDAKBggrBgEFBQcDATAMBgNVHRMBAf8EAjAAMAoGCCqGSM49BAMEA4GM
-ADCBiAJCAPC59IDKyxiKHmWEmKoEvTh4fg2ipJYkZpP/gam/fF1183ZUIo2rNsoi
-Wj12ElYYopRoBNi64fFkdZd5mOXf0jOlAkIAwqhs/siSPKIFLcCVIpBgFH2TX71v
-Xbf4OiO6TBjOnKgreJK5eB/CsrU7u9tLp37xxRAKg+xDwwrU7VL2m58sabc=
+	ssl      bool
+	gzip     bool
+	cache    bool
+	blue     *color.Color
+	certFile = `-----BEGIN CERTIFICATE-----
+MIIDHzCCAgcCFAWtII3r9G7eTl9aH+4jZjPqSlbeMA0GCSqGSIb3DQEBCwUAMEwx
+CzAJBgNVBAYTAlJPMRAwDgYDVQQIDAdSb21hbmlhMRUwEwYDVQQHDAxQaWF0cmEg
+TmVhbXQxFDASBgNVBAoMC0RldmVsb3BtZW50MB4XDTIwMTAxMzE1MDkwNVoXDTQ4
+MDIyOTE1MDkwNVowTDELMAkGA1UEBhMCUk8xEDAOBgNVBAgMB1JvbWFuaWExFTAT
+BgNVBAcMDFBpYXRyYSBOZWFtdDEUMBIGA1UECgwLRGV2ZWxvcG1lbnQwggEiMA0G
+CSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDhrJN3ZufMLz9uVHzwYXsrZcEFtwGw
+g2Uj3sbfzu6CWzv9tm8cyD4I1B6c9H5QHSFYkGyxPnFEokBIndRvhwPlQZy3zh0C
+rvgQp/tQmBNpdx5+V1lxx3SqILkbIQ/Fp8qnn6RYyct/KAGGNYF00rVJuYS0HEnl
+KcfhEM6vHoqurCFAMSRnkQaZ+l+FGqlMsegdkFbL2rLSFf5vAOZtddZrq2FgyiJq
+vzQWwyl079r3m/KrQodxnlxOnyIBekkcUx4AcVLf2tr64oy4qVlWocztPh/Lcbpa
+mpb4FlK9opPZ29LHREnG5B9ocGME0ogmJ6A+O0IHiToqvq13qNt85KJdAgMBAAEw
+DQYJKoZIhvcNAQELBQADggEBAJFn8xWO+OrWsD6GGI+rBJw/xNArmR29Z4W9MTxZ
+1PbVVbGJqEQKaR7e/cgNA8r6m1x5aA7JgNhYfD4pw3/XDRk9oTox01SDeV1S6HRk
+TamTbWCIEAxkxO88wifWFWh7IsGf3tpAyzFCE/o82q9MB00IOc41up3NXURu7rlI
+atBF3NZwKKXiKFNfTyJsN6twaL0pWnoCARlf03Yrv7jqQKM4P7B384Grh0MZs42R
+tHykpqgoYl7SIDxuh1yUDBRkuW2BdNTLaVu8Qp6D1y+LrYGxiWQoom+zDfrekHd8
+FaYXxwBGz9vsNy2uSyzOQhZueBg5Qs2RjEI8MG6fH3H9GyA=
 -----END CERTIFICATE-----`
-	certKEY = `-----BEGIN EC PRIVATE KEY-----
-MIHcAgEBBEIBH7pQIBNrx/j2DUbH2VZd8ffxu32t0u4YQYf35NrJYtWrNTVeTUoh
-keeRkQrQzXMSOyavW6ce4Jls9L1/7/CosrmgBwYFK4EEACOhgYkDgYYABABRo7zp
-mtZQPbKcm7pRQ5KD97hXTUOKyD43ECp4hDvDtMUQFCGVFkrsoy3XA6qEqDKs2vJS
-fqMVNctZMbBf/0f6ugAKqgqqfSRyM1QcGz4wc7bOEDOoOzKE03dduB0Lrw64Uo7/
-YhIExN3PEWEb08LxL2UUKLdOhLCpsFCF7UTqTFe3QA==
------END EC PRIVATE KEY-----`
+	keyFile = `-----BEGIN PRIVATE KEY-----
+MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDhrJN3ZufMLz9u
+VHzwYXsrZcEFtwGwg2Uj3sbfzu6CWzv9tm8cyD4I1B6c9H5QHSFYkGyxPnFEokBI
+ndRvhwPlQZy3zh0CrvgQp/tQmBNpdx5+V1lxx3SqILkbIQ/Fp8qnn6RYyct/KAGG
+NYF00rVJuYS0HEnlKcfhEM6vHoqurCFAMSRnkQaZ+l+FGqlMsegdkFbL2rLSFf5v
+AOZtddZrq2FgyiJqvzQWwyl079r3m/KrQodxnlxOnyIBekkcUx4AcVLf2tr64oy4
+qVlWocztPh/Lcbpampb4FlK9opPZ29LHREnG5B9ocGME0ogmJ6A+O0IHiToqvq13
+qNt85KJdAgMBAAECggEBALAZPql5v39xjwnFHAlnx/lBWbHf8I2QuqeW+5FBpJRM
+JTAB4AqRpva0r37Cup5BXPgDGw3kL/bitU70+gRdUwjefjBfwfuKFUDKFC37vYoa
+zczA1KcYgU0QY+Frlychm93ZkSFHtmfvC+FydyZ2FckF3yu8t1z/kV1rBB1as9VA
+PMsVhwl7NTPE9XSqNziINwLU4EwioR1JATz8rSo5sEiyxzj5TvXCaYdGWDztqnJY
+9HRQDm7G1NEjh2MealQca/eUGVstlt0MJNzuIgSVLcSXRT1EX/d0km7urvzCD2DA
+CfseSHl7LC4vsTDDru6DLOvr4KmPRwPdmPHNpifmZwECgYEA/K3lKDyNKcTFTe9m
+hwibUUFbvMRfiLY/3vs/msY4pxo0wKX55L5zka4YbAzBBjO+5SsVkBQ4rnmWZubm
+StJMHe3J6fQ/SFCds0Q9j5ggpTq7rbBq5p2/faOpNDPGxmiHf45yBDZE4JiyU4fe
+xAuGV/KIvZegVCIEDf4wZmqceNECgYEA5KPTZKKqAQAWNNaFcJBhZjU6+Tc48M1Q
+VV2KGZ7BOh5yw4MBYPqj8QM1bMGO4wWQP6xTKESaD/zCSSMUPIJrcAYoslmaFLlu
+gjooZPPUvcOqGmFNCxA7Ghz5xkcimtRO7NOAVndGLDPww1YpkhMM84+XyHg9ZQwX
+AdUvXzKyc80CgYEAhwFClyUDJ3YDFYj79toaYmfRZCJoCNuXdMQ5T7DpRB80YFpO
+EnHPvd6PHewSlgW/0SIb+0dSoaZFPeXQ1dlW4gbTAzWFOlYYbFfhrH9TsfSXok3I
+UD+ouLBhD4s6gXgILZcmRCna00XCwe6uj4C43vSvKt2AxHMIR5Gwuofr4oECgYBo
+tA1OfJ9VrfB9ae/ZyISSBbZoAj31KFCthxSC/wyFzQPJPOkYvC7vZATHNSx2Ekoo
+noXGXwQeZiWi0Imn3CHPP0LLyfShoPlWccOl13OJI112jzB07I3kO3i2sETMmoU6
+NvECp8Re4bpT+dU3q7m2n/9mMooLCCpREIuNEO5f0QKBgQDxE41okEfPWzahAF4s
+CpbijIv9QNhlMlTQLGHBb2TZIoEYt6cZPazMgS3jHx1l5kDVmEmyaxai4sKBKxJg
+OZGxx3reYHzKlWNY65AKSLg39ibYxPmh8w7rMWHNQ43HbnxI0drsAuAGwZ2RMQTK
+JUfLSXETUsn62nemwe5G3jMEGQ==
+-----END PRIVATE KEY-----`
 )
 
 func init() {
@@ -52,9 +80,21 @@ func main() {
 	}
 
 	// questions
-	gzip = doYouWant("gzip")
 	ssl = doYouWant("ssl")
+	gzip = doYouWant("gzip")
 	cache = doYouWant("cache")
+
+	// ssl logic
+	if ssl {
+		cert, err := tls.X509KeyPair([]byte(certFile), []byte(keyFile))
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		serverSSL.TLSConfig = &tls.Config{
+			Certificates: []tls.Certificate{cert},
+		}
+	}
 
 	// gzip logic
 	if ssl {
@@ -69,18 +109,6 @@ func main() {
 		}
 	}
 
-	// ssl logic
-	if ssl {
-		cert, err := tls.X509KeyPair([]byte(certPEM), []byte(certKEY))
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		serverSSL.TLSConfig = &tls.Config{
-			Certificates: []tls.Certificate{cert},
-		}
-	}
-
 	// cache logic
 	if cache {
 		http.Handle("/", middleware.Cache(http.FileServer(http.Dir("."))))
@@ -88,12 +116,11 @@ func main() {
 		http.Handle("/", http.FileServer(http.Dir(".")))
 	}
 
-	fmt.Println(gzip, ssl, cache)
+	fmt.Println(ssl, gzip, cache)
 
 	if ssl {
-		go func() {
-			log.Fatalln(serverSSL.ListenAndServeTLS("", ""))
-		}()
+		go serverSSL.ListenAndServeTLS("", "")
+
 	}
 	log.Fatalln(serverHTTP.ListenAndServe())
 }
