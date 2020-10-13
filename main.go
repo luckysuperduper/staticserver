@@ -1,13 +1,13 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"github.com/fatih/color"
 	"github.com/luckysuperduper/staticserver/middleware"
 	"log"
 	"net/http"
 	"os"
-	"os/signal"
 	"runtime"
 	"strings"
 )
@@ -71,8 +71,14 @@ func main() {
 
 	// ssl logic
 	if ssl {
-		createCertFiles()
-		defer deleteCertFiles()
+		cert, err := tls.X509KeyPair([]byte(certPEM), []byte(certKEY))
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		serverSSL.TLSConfig = &tls.Config{
+			Certificates: []tls.Certificate{cert},
+		}
 	}
 
 	// cache logic
@@ -86,31 +92,10 @@ func main() {
 
 	if ssl {
 		go func() {
-			log.Fatalln(serverSSL.ListenAndServeTLS("certFile", "keyFile"))
+			log.Fatalln(serverSSL.ListenAndServeTLS("", ""))
 		}()
 	}
 	log.Fatalln(serverHTTP.ListenAndServe())
-}
-
-func createCertFiles() {
-	files := map[string]string{"certFile": certPEM, "keyFile": certKEY}
-	for file, content := range files {
-		f, err := os.Create(file)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		f.WriteString(content)
-		f.Close()
-	}
-}
-
-func deleteCertFiles() {
-	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt)
-
-	<-c
-	os.RemoveAll("certFile")
-	os.RemoveAll("keyFile")
 }
 
 func doYouWant(option string) (yes bool) {
