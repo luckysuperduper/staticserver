@@ -13,6 +13,8 @@ import (
 )
 
 var (
+	portHTTP = ":8080"
+	portSSL  = ":8043"
 	ssl      bool
 	gzip     bool
 	cache    bool
@@ -72,11 +74,11 @@ func init() {
 
 func main() {
 	serverHTTP := http.Server{
-		Addr: ":8080",
+		Addr: portHTTP,
 	}
 
 	serverSSL := http.Server{
-		Addr: ":8433",
+		Addr: portSSL,
 	}
 
 	// questions
@@ -116,12 +118,21 @@ func main() {
 		http.Handle("/", http.FileServer(http.Dir(".")))
 	}
 
-	fmt.Println(ssl, gzip, cache)
-
 	if ssl {
-		go serverSSL.ListenAndServeTLS("", "")
-
+		if runtime.GOOS == "linux" || runtime.GOOS == "darwin" {
+			fmt.Println("Navigate to: " + blue.Sprintf("https://localhost%s", portSSL))
+		} else {
+			fmt.Println("Navigate to: https://localhost" + portSSL)
+		}
+		go log.Fatalln(serverSSL.ListenAndServeTLS("", ""))
+	} else {
+		if runtime.GOOS == "linux" || runtime.GOOS == "darwin" {
+			fmt.Println("Navigate to: " + blue.Sprintf("http://localhost%s", portHTTP))
+		} else {
+			fmt.Println("Navigate to: http://localhost" + portHTTP)
+		}
 	}
+
 	log.Fatalln(serverHTTP.ListenAndServe())
 }
 
@@ -155,5 +166,5 @@ func doYouWant(option string) (yes bool) {
 }
 
 func redirectTLS(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "https://localhost:8443"+r.RequestURI, http.StatusMovedPermanently)
+	http.Redirect(w, r, "https://localhost"+portSSL+r.RequestURI, http.StatusMovedPermanently)
 }
